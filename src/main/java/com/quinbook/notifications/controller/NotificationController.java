@@ -1,6 +1,7 @@
 package com.quinbook.notifications.controller;
 
 import com.quinbook.notifications.dto.*;
+import com.quinbook.notifications.entity.FriendRequestAcceptanceNotification;
 import com.quinbook.notifications.service.FriendRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.openfeign.EnableFeignClients;
@@ -32,5 +33,10 @@ public class NotificationController {
     @PostMapping("/notificationHistory")
     public ResponseEntity<NotificationHistoryResponseDTO> fetchHistory(@RequestBody NotificationHistoryRequestDTO requestDTO){
         return friendRequestService.fetchNotificationHistory(requestDTO);
+    }
+
+    @PostMapping("/friendRequestAccepted")
+    public void frndReqAcc(@RequestBody FriendRequestAcceptanceDTO request){
+        friendRequestService.friendRequestAccepted(request);
     }
 }

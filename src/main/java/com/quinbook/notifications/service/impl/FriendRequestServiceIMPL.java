@@ -2,9 +2,10 @@ package com.quinbook.notifications.service.impl;
 
 import com.mongodb.client.MongoClients;
 import com.quinbook.notifications.client.SessionClient;
-import com.quinbook.notifications.constants.StatusMessages;
+import com.quinbook.notifications.constants.ConstantStrings;
 import com.quinbook.notifications.dto.*;
 import com.quinbook.notifications.entity.Friend;
+import com.quinbook.notifications.entity.FriendRequestAcceptanceNotification;
 import com.quinbook.notifications.entity.FriendRequestNotification;
 import com.quinbook.notifications.entity.Notifications;
 import com.quinbook.notifications.repository.NotificationsRepository;
@@ -54,8 +55,8 @@ public class FriendRequestServiceIMPL implements FriendRequestService {
             FriendRequestNotification friendRequestNotification = new FriendRequestNotification();
             Friend friend = new Friend();
             BeanUtils.copyProperties(requestDTO.getSelfDetails(),friend);
-            friendRequestNotification.setStatus(StatusMessages.NOT_YET_INTERACTED);
-            friendRequestNotification.setEventType(StatusMessages.FRIEND_REQUEST);
+            friendRequestNotification.setStatus(ConstantStrings.NOT_YET_INTERACTED);
+            friendRequestNotification.setEventType(ConstantStrings.FRIEND_REQUEST);
             friendRequestNotification.setFrom(userName);
             friendRequestNotification.setUserBaseProfile(friend);
             if(optional.isPresent()){
@@ -148,6 +149,48 @@ public class FriendRequestServiceIMPL implements FriendRequestService {
         catch (Exception e){
             response = new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
             return response;
+        }
+    }
+
+    @Override
+    public void friendRequestAccepted(FriendRequestAcceptanceDTO request) {
+        Notifications notifications = new Notifications();
+        if(request.getAcceptedBy() == null || request.getEventType() == null || request.getEventType().length()==0){
+            return;
+        }
+
+        else{
+            String userName = request.getWhose();
+            try{
+                Optional<Notifications> optional = notificationsRepository.findById(userName);
+                FriendRequestAcceptanceNotification obj = new FriendRequestAcceptanceNotification();
+                obj.setEventType(ConstantStrings.FRIEND_REQUEST_ACCEPT);
+                obj.setAcceptedBy(request.getAcceptedBy());
+                if(optional.isPresent()){
+                    Query query = new Query();
+                    Criteria criteria = Criteria.where("userName").is(userName);
+                    query.addCriteria(criteria);
+                    Update update = new Update().push("latestNotification",obj);
+                    mongoOperations.updateFirst(query,update,Notifications.class);
+                    update = new Update().push("notificationHistory",obj);
+                    mongoOperations.updateFirst(query,update,Notifications.class);
+
+                }
+                else{
+                    notifications.setUserName(userName);
+                    List l = new ArrayList();
+                    l.add(obj);
+                    notifications.setNotificationHistory(l);
+                    l = new ArrayList();
+                    l.add(obj);
+                    notifications.setLatestNotification(l);
+                    notificationsRepository.save(notifications);
+                }
+
+            }
+            catch (Exception e){
+
+            }
         }
     }
 }

@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 //TODO: config feign
 
-@FeignClient(name = "session-client",url = "//yet to give")
+@FeignClient(name = "session-client",url = "http://10.177.68.66:8082")
 public interface SessionClient {
-    @RequestMapping(method = RequestMethod.POST,path = "//yet to decide")
-    public String getUserName(@RequestParam("sessionId") String sessionId);
+    @RequestMapping(method = RequestMethod.POST,path = "/fetchUserName")
+    String getUserName(@RequestParam("sessionId") String sessionId);
 }
