@@ -5,4 +5,6 @@ public interface ConstantStrings {
     String FRIEND_REQUEST = "FRNDREQ";
     String NEW_POST = "NEWPOST";
     String FRIEND_REQUEST_ACCEPT = "FRNDREQACC";
+    String SUCCESS = "SUCCESS";
+    String DATABASE_NAME = "quinbook";
 }

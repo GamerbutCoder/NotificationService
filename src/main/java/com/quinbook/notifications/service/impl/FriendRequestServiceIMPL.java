@@ -26,10 +26,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.quinbook.notifications.constants.ConstantStrings.*;
+
+
 @Service
 public class FriendRequestServiceIMPL implements FriendRequestService {
 
-    static MongoOperations mongoOperations = new MongoTemplate(MongoClients.create(),"quinbook");
+    static MongoOperations mongoOperations = new MongoTemplate(MongoClients.create(),DATABASE_NAME);
 
     @Autowired
     private SessionClient sessionClient;
@@ -37,7 +40,6 @@ public class FriendRequestServiceIMPL implements FriendRequestService {
     @Autowired
     private NotificationsRepository notificationsRepository;
 
-    //                String toUserName = sessionClient.getUserName(requestDTO.getSessionId());
 
     @Override
     public ResponseEntity<FriendRequestResponseDTO> notifyUser(FriendRequestDTO requestDTO) {
@@ -50,6 +52,7 @@ public class FriendRequestServiceIMPL implements FriendRequestService {
         }
         else{
             String userName = requestDTO.getSelfDetails().getUserName(); //if name is not avail then use sessionclient to fetch
+            //String toUserName = sessionClient.getUserName(requestDTO.getSessionId());
             Notifications notification;
             Optional<Notifications> optional = notificationsRepository.findById(requestDTO.getToWhom());
             FriendRequestNotification friendRequestNotification = new FriendRequestNotification();
@@ -57,7 +60,6 @@ public class FriendRequestServiceIMPL implements FriendRequestService {
             friend.setUserName(requestDTO.getSelfDetails().getUserName());
             friend.setFullName(requestDTO.getSelfDetails().getUserName());
             friend.setProfilePic(requestDTO.getSelfDetails().getProfilePic());
-            //BeanUtils.copyProperties(requestDTO.getSelfDetails(),friend);
             friendRequestNotification.setStatus(ConstantStrings.NOT_YET_INTERACTED);
             friendRequestNotification.setEventType(ConstantStrings.FRIEND_REQUEST);
             friendRequestNotification.setFrom(userName);
@@ -84,7 +86,7 @@ public class FriendRequestServiceIMPL implements FriendRequestService {
                 notificationsRepository.save(notification);
             }
 
-            response.setMessage("SUCCESS");
+            response.setMessage(SUCCESS);
             return new ResponseEntity<>(response,HttpStatus.OK);
         }
     }
@@ -135,7 +137,6 @@ public class FriendRequestServiceIMPL implements FriendRequestService {
         NotificationHistoryResponseDTO notificationHistoryResponseDTO = new NotificationHistoryResponseDTO();
         try{
             String userName = sessionClient.getUserName(requestDTO.getSessionId());
-           // String userName = "abcd";
             Optional<Notifications> optional = notificationsRepository.findById(userName);
             if(optional.isPresent()){
                 Notifications notifications = optional.get();
