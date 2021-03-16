@@ -54,7 +54,10 @@ public class FriendRequestServiceIMPL implements FriendRequestService {
             Optional<Notifications> optional = notificationsRepository.findById(requestDTO.getToWhom());
             FriendRequestNotification friendRequestNotification = new FriendRequestNotification();
             Friend friend = new Friend();
-            BeanUtils.copyProperties(requestDTO.getSelfDetails(),friend);
+            friend.setUserName(requestDTO.getSelfDetails().getUserName());
+            friend.setFullName(requestDTO.getSelfDetails().getUserName());
+            friend.setProfilePic(requestDTO.getSelfDetails().getProfilePic());
+            //BeanUtils.copyProperties(requestDTO.getSelfDetails(),friend);
             friendRequestNotification.setStatus(ConstantStrings.NOT_YET_INTERACTED);
             friendRequestNotification.setEventType(ConstantStrings.FRIEND_REQUEST);
             friendRequestNotification.setFrom(userName);
@@ -65,8 +68,8 @@ public class FriendRequestServiceIMPL implements FriendRequestService {
                 query.addCriteria(criteria);
                 Update update = new Update().push("latestNotification",friendRequestNotification);
                 mongoOperations.updateFirst(query,update,Notifications.class);
-                update = new Update().push("notificationHistory",friendRequestNotification);
-                mongoOperations.updateFirst(query,update,Notifications.class);
+               Update update1 = new Update().push("notificationHistory",friendRequestNotification);
+                mongoOperations.updateFirst(query,update1,Notifications.class);
 
             }
             else{
@@ -75,8 +78,9 @@ public class FriendRequestServiceIMPL implements FriendRequestService {
                 List l = new ArrayList();
                 l.add(friendRequestNotification);
                 notification.setLatestNotification(l);
-                l = new ArrayList();
-                notification.setNotificationHistory(l);
+                List l1 = new ArrayList();
+                l1.add(friendRequestNotification);
+                notification.setNotificationHistory(l1);
                 notificationsRepository.save(notification);
             }
 
@@ -91,7 +95,8 @@ public class FriendRequestServiceIMPL implements FriendRequestService {
         ResponseEntity<LatestNotificationResponseDTO> response;
         LatestNotificationResponseDTO latestNotificationResponseDTO = new LatestNotificationResponseDTO();
         try{
-             String userName = sessionClient.getUserName(requestDTO.getSessionId());
+            String sessionId = requestDTO.getSessionId();
+             String userName = sessionClient.getUserName(sessionId);
             //String userName = "abcd";
             Optional<Notifications> optional = notificationsRepository.findById(userName);
             if(optional.isPresent()){
@@ -117,6 +122,7 @@ public class FriendRequestServiceIMPL implements FriendRequestService {
             }
         }
         catch (Exception e){
+            System.out.println(e);
             response = new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
             return response;
         }
@@ -142,11 +148,13 @@ public class FriendRequestServiceIMPL implements FriendRequestService {
                 return response;
             }
             else{
+
                 response = new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
                 return response;
             }
         }
         catch (Exception e){
+            System.out.println(e);
             response = new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
             return response;
         }
@@ -172,8 +180,8 @@ public class FriendRequestServiceIMPL implements FriendRequestService {
                     query.addCriteria(criteria);
                     Update update = new Update().push("latestNotification",obj);
                     mongoOperations.updateFirst(query,update,Notifications.class);
-                    update = new Update().push("notificationHistory",obj);
-                    mongoOperations.updateFirst(query,update,Notifications.class);
+                   Update update1 = new Update().push("notificationHistory",obj);
+                    mongoOperations.updateFirst(query,update1,Notifications.class);
 
                 }
                 else{

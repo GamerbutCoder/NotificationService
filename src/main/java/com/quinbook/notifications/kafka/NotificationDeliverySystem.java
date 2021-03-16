@@ -39,7 +39,7 @@ public class NotificationDeliverySystem {
         String[] keys = key.split("--");
         if(ConstantStrings.NEW_POST.equals(keys[0])){
             String obj = message.getPayload();
-            System.out.println(obj);
+            //System.out.println(obj);
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 LatestPostNotification newPost = objectMapper.readValue(obj, LatestPostNotification.class);
@@ -63,6 +63,7 @@ public class NotificationDeliverySystem {
                         notifications.setLatestNotification(latestNotification);
                         List notificationHistory = new ArrayList();
                         notificationHistory.add(newPost);
+                        notifications.setNotificationHistory(notificationHistory);
                         notificationsRepository.save(notifications);
                     }
 

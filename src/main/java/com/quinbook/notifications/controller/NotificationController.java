@@ -1,11 +1,8 @@
 package com.quinbook.notifications.controller;
 
 import com.quinbook.notifications.dto.*;
-import com.quinbook.notifications.entity.FriendRequestAcceptanceNotification;
 import com.quinbook.notifications.service.FriendRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
